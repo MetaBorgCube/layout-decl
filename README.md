@@ -1,8 +1,8 @@
 # Installation
 
-Download the artefact (Oracle VirtualBox OVA file) from [...](...). The file is compacted as a `tar.gz` file. Sometimes when extracting the file, the extractor creates an `.vmdk` and an `.ovf` file. In this case, import the `.ovf` file into Virtual Box using the instructions below.
+Download the artefact (Oracle VirtualBox OVA file) from [Google Drive](https://drive.google.com/open?id=1MTzZ7Pm9YGVYdQ_zdi0Ydr2feo0q78HM). The file is compacted as a `tar.gz` file. Sometimes when extracting the file, the extractor creates an `.vmdk` and an `.ovf` file. In this case, import the `.ovf` file into Virtual Box using the instructions below.
 
-Size: X.X GB
+Size: 2.8 GB
 
 The artefact is distributed as a VirtualBox image. To setup the image:
 
