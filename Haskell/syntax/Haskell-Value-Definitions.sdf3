@@ -1,0 +1,64 @@
+module Haskell-Value-Definitions
+
+imports
+  Haskell-Patterns
+  Haskell-Expressions
+  Haskell-Identifier-Sorts
+  Haskell-Modules
+
+context-free syntax
+
+  Decl = Valdef 
+  Valdef.Valdef = FunLHS "=" Exp MaybeWhere {longest-match}
+  Valdef.GdValdef = FunLHS Gdrh+ MaybeWhere {longest-match}
+  Gdrh.Guarded = "|" Exp "=" Exp 
+  FunLHS = Pat 
+  FunLHS.VarFunLHS = Var APat+ 
+  FunLHS.OpFunLHS = Pat Varop Pat 
+  FunLHS.NestedFunLHS = "(" FunLHS ")" APat+ 
+
+context-free syntax
+
+  Where.Where = "where" DeclList 
+  MaybeWhere =  {ast("Where(DeclList(Empty))")}
+  MaybeWhere = Where 
+  Declbinds = DeclList 
+
+context-free syntax
+
+  DeclList.DeclList = NoOffsideDeclBlock 
+  DeclList.DeclListOffside = OffsideDeclListOrEmpty {longest-match}
+  OffsideDeclListOrEmpty = OffsideDeclList {longest-match}
+  OffsideDeclListOrEmpty = Empty 
+  NoOffsideDeclBlock.NoOffsideDeclBlock = "{" NoOffsideDeclListSemOrEmpty "}" {ignore-layout}
+  NoOffsideDeclListSemOrEmpty = NoOffsideDeclListSem 
+  NoOffsideDeclListSemOrEmpty = Empty 
+  
+  NoOffsideDecl = Decl
+  NoOffsideDecl.SemiAfter = NoOffsideDecl ";"
+
+context-free syntax
+
+  NoOffsideDeclList = {NoOffsideDecl ";"}+
+  NoOffsideDeclListSem = NoOffsideDeclList 
+  NoOffsideDeclListSem.SemiBefore = ";" NoOffsideDeclListSem 
+  
+  OffsideDecl = decl:Decl {layout(offside decl)} // {layout(1.left.col > 1.first.col)} 
+  OffsideDecl.SemiAfter = decl:OffsideDecl ";" {layout(indent decl ";")} // {layout(2.first.col > 1.first.col)} 
+  OffsideDecl.SemiBefore = ";" decl:OffsideDecl {layout(indent ";" decl)} // {layout(2.first.col > 1.first.col)} 
+  OffsideDecl.DeclSeq = decl1:OffsideDecl ";" decl2:Decl {layout(indent decl1 ";", decl2  //{layout(1.first.col < 2.first.col && 1.first.col < 3.first.col &&
+                                                              && offside decl1 decl2) }         //  1.first.col < 3.left.col)} 
+  
+
+context-free priorities
+
+   OffsideDecl.SemiAfter
+  >
+   OffsideDecl.SemiBefore
+  >
+   OffsideDecl.DeclSeq
+  
+context-free syntax
+
+  OffsideDeclList = OffsideDecl+ {layout(align-list 1)} 
+//  OffsideDeclList.DeclSeq = decl1:OffsideDecl decl2:OffsideDeclList {layout(align decl1 decl2)} // {layout(1.first.col == 2.first.col)} 

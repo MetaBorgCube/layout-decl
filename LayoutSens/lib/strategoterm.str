@@ -1,0 +1,38 @@
+module lib/strategoterm
+
+imports 
+
+  libspoofax/term/annotation
+  signatures/LayoutSensPrettyPrint-sig
+  libstratego-gpp
+  libspoofax/sdf/pp
+  
+signature constructors
+  Align    : ConstraintTreeReference * List(ConstraintTreeReference) -> ShortConstraint
+  LabelRef : IdCon -> ConstraintTreeReference
+  LiteralRef : IdCon -> ConstraintTreeReference
+
+rules 
+prettyprint-LayoutSens-Stmt :
+    IfElse(t1__, then__, else__) -> <add-annotations(|[Align(LiteralRef("\"if\""),[LiteralRef("\"else\"")])])> [ H(
+                                        [SOpt(HS(), "0")]
+                                      , then__
+                                      )
+                                    ]
+    with then__' := <clean-layout-empty-symbols(
+                     | ""
+                     , FALSE()
+                     , FALSE()
+                     )
+                     ; flatten-list
+                     ; pp-indent(|"3")> [ <(check-nonterminal-isEmpty ; id
+                                            <+ pp-V-list(prettyprint-LayoutSens-Stmt)
+                                            <+ pp-one-Z(prettyprint-completion-aux))
+                                           ; add-annotations(
+                                             | [Align(LabelRef("then"), [])
+                                             , LabelRef("then")]
+                                             )> then__
+                                        ]
+                                   
+                                   
+                                   // App(CallT(SVar("add-annotation"), [], [ ]), )

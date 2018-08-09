@@ -1,0 +1,94 @@
+module Haskell-Expressions
+
+imports
+  Haskell-Identifier-Sorts
+  Haskell-Literals
+  Haskell-Patterns
+  Haskell-Numbers
+  Haskell-Statements
+  Haskell-Type-Classes
+  Haskell-Types
+  Haskell-Value-Definitions
+  Haskell-Case-Alternatives
+
+context-free syntax
+
+  AnyExp = Exp 
+  Exp.Var = Qvar 
+  Exp.Constr = Gcon 
+  Exp.Lit = Literal 
+  Exp.Product = "(" Exps2 ")" 
+  Exp.Paren = "(" Exp ")" 
+  Exps.ExpList = {Exp ","}+ 
+  Exps2.Const = Exp "," {Exp ","}+ 
+  Fargs.APatList = APat+ 
+
+context-free syntax
+
+  Infix.Infix = "infix" 
+  Infix.InfixL = "infixl" 
+  Infix.InfixR = "infixr" 
+  Prec.Integer = INTEGER? 
+  Ops.OpsList = {Op ","}+ 
+  Fixdecl.FixDecl = Infix Prec Ops 
+  Decl = Fixdecl 
+  Exp.LSection = "(" Exp Qop ")" 
+  Exp.RSection = "(" QopNoNeg Exp ")" 
+  QopNoNeg = Qop 
+  QopNoNeg = "-" {reject}
+  LabelBinds.LabelBinds = "{" {Fbind ","}* "}" {ignore-layout}
+
+context-free syntax
+  
+  Exp.Named = Qvar "@" Exp
+  Exp.Labeled = Exp LabelBinds
+  Exp.AppBin = Exp Exp {left}
+  Exp.Negation = "-" Exp  
+  Exp.OpApp = Exp Qop Exp {right}
+  Exp.Typed = Exp "::" Context? Type
+  
+context-free priorities
+  
+  Exp.Named >
+  Exp.Labeled > 
+  Aexp = Exp > 
+  Exp.AppBin >
+  Exp.Negation > 
+  Exp.OpApp >
+  Exp.Typed
+
+context-free syntax
+
+  Exp.Abs = "\\" Fargs "->" Exp {longest-match}
+  Exp.Let = "let" Declbinds "in" Exp  {longest-match}
+  Exp.If = "if" AnyExp "then" AnyExp "else" Exp  {longest-match}
+  Exp.Do = "do" StmtList  {longest-match}
+  Exp.Case = "case" AnyExp "of" AltList {longest-match}
+
+context-free priorities
+
+  Exp.AppBin > 
+  {
+     Exp.Abs
+     Exp.Let
+     Exp.If
+     Exp.Case
+     Exp.Do
+  },
+  
+  Exp.OpApp > 
+  {
+     Exp.Abs
+     Exp.Let
+     Exp.If
+   },
+   Exp.Typed .> 
+   {
+     Exp.Abs
+     Exp.Let
+     Exp.If
+   },
+   Exp.AppBin <1>.> Exp.OpApp,
+   Exp.AppBin <0>.> Exp.Typed, 
+   Exp.AppBin <1> .> Exp.Negation,
+   Exp.OpApp <0> .> Exp.Typed

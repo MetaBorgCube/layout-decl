@@ -1,0 +1,7 @@
+if 1 then
+  if 2 then
+    x = 2 + 2 + 3
+  else 
+    y = 1
+else
+  y = 1 + 8 + 9

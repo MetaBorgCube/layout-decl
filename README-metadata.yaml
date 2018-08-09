@@ -1,0 +1,12 @@
+---
+title:  Submission for SLE 2018 Artifact Evaluation
+subtitle: 'Declarative Specification of Indentation Rules: A Tooling Perspective on Parsing and Pretty-Printing Layout-Sensitive Languages'
+header-includes:
+  - \hypersetup{colorlinks=true,
+            allbordercolors={0 0 0},
+            pdfborderstyle={/U 1}}
+  - \providecommand{\subtitle}[1]{\usepackage{titling}\posttitle{\par\large#1\end{center}}}
+  - \lstset{basicstyle=\ttfamily\small}  
+geometry: margin=3cm         
+output: pdf_document
+---

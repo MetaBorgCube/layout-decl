@@ -1,0 +1,61 @@
+module pp
+
+imports
+
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/editor/refactoring/-
+  pp/Haskell-parenthesize
+  pp/Haskell-pp
+  annotatebox 
+
+rules
+  external apply-lc-to-box(|)
+
+rules
+
+  editor-format:
+    (node, _, ast, path, project-path) -> (filename, result)
+    with
+      ext      := <get-extension> path
+    ; filename := <guarantee-extension(|$[sdf3pp.[ext]])> path
+    ; result   := <pp-debug> node
+
+rules 
+//  apply-layout-constraints-to-box = prim("SSL_EXT_apply_layout_constraints_pp") <+ id
+
+rules
+  
+  pp-Haskell-string =
+    parenthesize-Haskell
+    ; prettyprint-Haskell-start-symbols
+    ; !V([], <id>)
+    ; annotate-box-line-col(|Position(1, 1))
+    ; apply-lc-to-box
+//    ; apply-layout-constraints-to-box
+    ; box2text-string(|120)
+      
+  pp-partial-Haskell-string =
+    parenthesize-Haskell
+    ; prettyprint-Haskell
+    ; !V([], <id>)
+    ; box2text-string(|120)
+    
+  pp-partial-Haskell-string(|sort) =
+    parenthesize-Haskell
+    ; prettyprint-Haskell(|sort)
+    ; !V([], <id>)
+    ; box2text-string(|120)  
+      
+  pp-debug :
+    ast -> result
+    with
+       result := <pp-Haskell-string> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-Haskell-string); debug(!"cannot pp ")))> ast
+    ;  result := ""
+
+rules
+  
+  construct-textual-change = construct-textual-change(pp-partial-Haskell-string, parenthesize, override-reconstruction, resugar)
+  
+  check-nonterminal-isEmpty = ?Empty()

@@ -1,0 +1,4 @@
+/layout-sensitive-decl/data/*
+
+!/layout-sensitive-decl/data/README.md
+!/layout-sensitive-decl/data/download-data-gdrive.sh

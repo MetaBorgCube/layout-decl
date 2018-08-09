@@ -1,0 +1,1 @@
+Module("completion/Haskell-cp",[Imports([(),()]),Imports([()]),Imports([(),(),(),(),()])])

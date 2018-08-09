@@ -1,0 +1,1 @@
+Module("libspoofax/editor/refactoring/interface",[Rules([SDefT("resugar",[],[],Fail),SDefT("parenthesize",[],[],Fail),SDefT("override-reconstruction",[],[],Fail)])])

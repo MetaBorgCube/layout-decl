@@ -1,0 +1,37 @@
+module lib/LayoutSens-pp
+
+imports
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/term/origin
+  libstratego-sglr
+  signatures/LayoutSens-sig
+
+
+imports
+  signatures/Common-sig
+  signatures/LayoutSensPrettyPrint-sig
+
+
+imports
+  lib/Common-pp
+  lib/LayoutSensPrettyPrint-pp
+
+
+strategies
+  prettyprint-example =
+    prettyprint-LayoutSens
+
+  prettyprint-LayoutSens =
+    fail
+
+  prettyprint-LayoutSens(|sort) =
+    fail
+
+
+strategies
+  prettyprint-SDF-start-symbols =
+    prettyprint-LayoutSens-start-symbols
+
+  prettyprint-LayoutSens-start-symbols(|line, col) =
+    fail

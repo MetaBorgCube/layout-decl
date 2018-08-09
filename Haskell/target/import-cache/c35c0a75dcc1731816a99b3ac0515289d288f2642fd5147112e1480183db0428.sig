@@ -1,0 +1,1 @@
+Module("libspoofax/stratego/dynrule",[Rules([SDefT("reset-dynamic-rules",[],[],Seq(CallT(SVar("try"),[CallT(SVar("dr-scope-all-end"),[],[])],[]),CallT(SVar("dr-scope-all-start"),[],[])))])])

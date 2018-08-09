@@ -1,0 +1,1 @@
+Module("outline",[Imports([Import("signatures/Haskell-sig"),Import("libspoofax/editor/outline")]),Rules([RDefNoArgs("editor-outline",Rule(NoAnnoList(Tuple([Wld,Wld,Var("ast"),Var("path"),Var("project-path")])),Var("outline"),Assign(Var("outline"),App(Call(SVar("simple-label-outline"),[CallNoArgs(SVar("to-outline-label"))]),Var("ast"))))),SDefNoArgs("to-outline-label",Fail)])])

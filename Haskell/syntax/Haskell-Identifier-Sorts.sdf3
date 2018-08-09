@@ -1,0 +1,173 @@
+module Haskell-Identifier-Sorts
+
+imports
+  Haskell-Identifiers
+  Haskell-Keywords
+  
+
+lexical syntax
+
+  Varid = VARID 
+  Varid = "case"  {reject}
+  Varid = "class" {reject}
+  Varid = "data" {reject}
+  Varid = "default" {reject}
+  Varid = "deriving" {reject}
+  Varid = "do" {reject}
+  Varid = "else" {reject}
+  Varid = "if" {reject}
+  Varid = "import" {reject}
+  Varid = "in" {reject}
+  Varid = "infix" {reject}
+  Varid = "infixl" {reject}
+  Varid = "infixr" {reject}
+  Varid = "instance" {reject}
+  Varid = "let" {reject}
+  Varid = "module" {reject}
+  Varid = "newtype" {reject}
+  Varid = "of" {reject}
+  Varid = "then" {reject}
+  Varid = "type" {reject}
+  Varid = "where" {reject}
+  Varid = "_" {reject}     
+    
+  Tyvar = VARID 
+//  Tyvar = ReservedId {reject}
+  Tyvar = "case"  {reject}
+  Tyvar = "class" {reject}
+  Tyvar = "data" {reject}
+  Tyvar = "default" {reject}
+  Tyvar = "deriving" {reject}
+  Tyvar = "do" {reject}
+  Tyvar = "else" {reject}
+  Tyvar = "if" {reject}
+  Tyvar = "import" {reject}
+  Tyvar = "in" {reject}
+  Tyvar = "infix" {reject}
+  Tyvar = "infixl" {reject}
+  Tyvar = "infixr" {reject}
+  Tyvar = "instance" {reject}
+  Tyvar = "let" {reject}
+  Tyvar = "module" {reject}
+  Tyvar = "newtype" {reject}
+  Tyvar = "of" {reject}
+  Tyvar = "then" {reject}
+  Tyvar = "type" {reject}
+  Tyvar = "where" {reject}
+  Tyvar = "_" {reject}     
+  
+  
+  
+//  Tyvar = ReservedId0 {reject}
+
+context-free syntax
+
+  Vars.Snoc = Vars "," Var 
+  Vars.Ins = Qvar 
+
+context-free syntax
+
+  Gcon.Unit = "(" ")" 
+  Gcon.EmptyList = "[" "]" 
+  Gcon.Product = "(" Comma+ ")" 
+  Comma.Comma = ","
+  Gcon = Qcon 
+
+  %% The following portion can be put into module Haskell-Infix
+  %% in order to factor out infix operators from the kernel language
+
+context-free syntax
+
+  %% variable identifiers
+
+  Qvarid = Varid 
+  Qvarid = QVARID 
+  Var.Var = Varid 
+  Qvar = Qvarid 
+  
+  %% infix operators
+  
+  Op.Op = Varop 
+  Op.ConOp = Conop 
+  
+  %% variable operators
+  
+  Qvarsym = Varsym 
+  Qvarsym = Qvarsym1 
+  
+  %% constructor operators
+  
+  Varop = Varsym 
+  Varop.PrefOp = "`" Varid "`" 
+  Qvarop = Qvarsym 
+  Qvarop.PrefOp = "`" Qvarid "`" 
+  Conop = Consym 
+  Conop.PrefCon = "`" Conid "`" 
+  Qconop = Gconsym 
+  Qconop.PrefCon = "`" Qconid "`" 
+  Qop = Qvarop 
+  Qop = Qconop 
+  Gconsym = Qconsym 
+  Gconsym = ConsOp 
+  ConsOp.ConsOp = CONSOP 
+  Qconsym = Consym 
+  Qconsym = QCONSYM 
+  Consym = CONSYM 
+  
+  %% make prefix symbols from infix symbols
+  
+  Var.BinOp = "(" Varsym ")" 
+  Qvar.BinOp = "(" Qvarsym ")" 
+  Con.BinCon = "(" Consym ")" 
+  Qcon.BinCon = "(" Qconsym ")" 
+
+context-free syntax
+
+  Varsym = VARSYM 
+  Qvarsym1 = QVARSYM 
+
+context-free syntax
+
+  Tycon = CONID 
+  Qtycon = Tycon 
+  Qtycon = QCONID 
+  Tycls = Tycon 
+  Qtycls = Qtycon 
+  
+   %% constructor identifiers
+   
+  Conid = CONID 
+  Qconid = Conid 
+  Qconid = QCONID 
+  Con.ConId = Conid 
+  Qcon = Qconid 
+
+  %% in each of these cases the constructor ID in fact is a module ID
+  %% that quantifies a variable, constructor, type or operator
+
+context-free restrictions
+
+  Qconid -/- [\.].[a-zA-Z\!\#\$\%\&\*\+\.\/\<\=\>\?\@\\\^\|\-\~]
+  Qconid -/- [\.].[\_]
+  Qconid -/- [\.].[\:]
+  Qtycon -/- [\.].[a-zA-Z\!\#\$\%\&\*\+\.\/\<\=\>\?\@\\\^\|\-\~]
+  Qtycon -/- [\.].[\_]
+  Qtycon -/- [\.].[\:]
+
+lexical syntax
+
+  Modid = CONID 
+
+lexical syntax
+
+
+  QVARID.QVarId = Modid "." VARID
+  QCONID.QConId = Modid "." CONID
+  QVARSYM.QVarSym = Modid "." VARSYM
+  QCONSYM.QConSym = Modid "." CONSYM
+
+lexical syntax
+
+  QModid.QModId  = CONID "." Modid
+  QModid.QModId2 = CONID "." QModid 
+  Modid = QModid 

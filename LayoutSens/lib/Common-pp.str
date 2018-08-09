@@ -1,0 +1,146 @@
+module lib/Common-pp
+
+imports
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/term/origin
+  libstratego-sglr
+  signatures/Common-sig
+
+
+strategies
+  prettyprint-example =
+    prettyprint-LayoutSens
+
+  prettyprint-LayoutSens =
+    fail
+
+  prettyprint-LayoutSens(|sort) =
+    fail
+
+
+strategies
+  prettyprint-SDF-start-symbols =
+    prettyprint-LayoutSens-start-symbols
+
+  prettyprint-LayoutSens-start-symbols =
+    fail
+
+
+strategies
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-ID
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-INT
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-STRING
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-StringChar
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-BackSlashChar
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-CommentChar
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-InsideComment
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-NewLineEOF
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-EOF
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-ID>
+    where <?"ID"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-INT>
+    where <?"INT"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-STRING>
+    where <?"STRING"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-StringChar>
+    where <?"StringChar"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-BackSlashChar>
+    where <?"BackSlashChar"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-CommentChar>
+    where <?"CommentChar"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-InsideComment>
+    where <?"InsideComment"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-NewLineEOF>
+    where <?"NewLineEOF"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-EOF>
+    where <?"EOF"> sort
+
+  prettyprint-LayoutSens-ID =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-INT =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-STRING =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-StringChar =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-BackSlashChar =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-CommentChar =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-InsideComment =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-NewLineEOF =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-EOF =
+    ![S(<is-string>)]
+
+  prettyprint-LayoutSens-ID :
+    amb([h|hs]) -> <prettyprint-LayoutSens-ID> h
+
+  prettyprint-LayoutSens-INT :
+    amb([h|hs]) -> <prettyprint-LayoutSens-INT> h
+
+  prettyprint-LayoutSens-STRING :
+    amb([h|hs]) -> <prettyprint-LayoutSens-STRING> h
+
+  prettyprint-LayoutSens-StringChar :
+    amb([h|hs]) -> <prettyprint-LayoutSens-StringChar> h
+
+  prettyprint-LayoutSens-BackSlashChar :
+    amb([h|hs]) -> <prettyprint-LayoutSens-BackSlashChar> h
+
+  prettyprint-LayoutSens-CommentChar :
+    amb([h|hs]) -> <prettyprint-LayoutSens-CommentChar> h
+
+  prettyprint-LayoutSens-InsideComment :
+    amb([h|hs]) -> <prettyprint-LayoutSens-InsideComment> h
+
+  prettyprint-LayoutSens-NewLineEOF :
+    amb([h|hs]) -> <prettyprint-LayoutSens-NewLineEOF> h
+
+  prettyprint-LayoutSens-EOF :
+    amb([h|hs]) -> <prettyprint-LayoutSens-EOF> h

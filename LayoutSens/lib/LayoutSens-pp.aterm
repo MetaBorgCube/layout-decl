@@ -1,0 +1,17 @@
+Module(
+  "lib/LayoutSens-pp"
+, [ Imports(
+      [ Import("libstratego-gpp")
+      , Import("libspoofax/sdf/pp")
+      , Import("libspoofax/term/origin")
+      , Import("libstratego-sglr")
+      , Import("signatures/LayoutSens-sig")
+      ]
+    )
+  , Imports([Import("signatures/Common-sig"), Import("signatures/LayoutSensPrettyPrint-sig")])
+  , Imports([Import("lib/Common-pp"), Import("lib/LayoutSensPrettyPrint-pp")])
+  , Strategies(
+      [SDefNoArgs("check-nonterminal-isEmpty", Match(NoAnnoList(Op("Foo", []))))]
+    )
+  ]
+)

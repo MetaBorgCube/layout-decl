@@ -1,0 +1,1 @@
+Module("libspoofax/editor/completion/interface",[Rules([SDefT("suggest-completions",[],[DefaultVarDec("iset")],Fail),SDefT("suggest-completions-right-rec",[],[DefaultVarDec("iset")],Fail),SDefT("suggest-completions-left-rec",[],[DefaultVarDec("iset")],Fail),SDefNoArgs("is-SDF-placeholder",Fail),SDefNoArgs("is-left-recursive",Fail),SDefNoArgs("is-right-recursive",Fail)])])

@@ -1,0 +1,1 @@
+Module("signatures/Haskell-sig",[Imports([Import("signatures/Haskell-Syntax-sig"),Import("signatures/GHC-Flexible-Stuff-sig"),Import("signatures/GHC-Magic-Hash-sig"),Import("signatures/GHC-GeneralizedNewtypeDeriving-sig"),Import("signatures/Haskell-Modules-sig")]),Signature([Constructors([])])])

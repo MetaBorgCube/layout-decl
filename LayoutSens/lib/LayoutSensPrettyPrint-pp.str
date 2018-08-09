@@ -1,0 +1,436 @@
+module pp/LayoutSensPrettyPrint-pp
+
+imports
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/term/origin
+  libspoofax/term/annotation
+  libstratego-sglr
+  libstratego-sglr
+  signatures/LayoutSensPrettyPrint-sig
+
+
+imports
+  signatures/Common-sig
+
+
+imports
+  pp/Common-pp
+
+
+strategies
+  prettyprint-example =
+    prettyprint-LayoutSens
+
+  prettyprint-LayoutSens =
+    fail
+
+  prettyprint-LayoutSens(|sort) =
+    fail
+
+
+strategies
+  prettyprint-SDF-start-symbols =
+    prettyprint-LayoutSens-start-symbols
+
+  prettyprint-LayoutSens-start-symbols =
+    fail
+
+
+strategies
+  prettyprint-LayoutSens-start-symbols =
+    prettyprint-LayoutSens-Start
+
+
+strategies
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-Start
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-Stmt
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-MaybeWhere
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-Where
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-Start>
+    where <?"Start"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-Stmt>
+    where <?"Stmt"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-MaybeWhere>
+    where <?"MaybeWhere"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-Where>
+    where <?"Where"> sort
+
+  prettyprint-LayoutSens-Start :
+    t1__ -> [ H(
+                [SOpt(HS(), "0")]
+              , t1__'
+              )
+            ]
+    where not(is-LayoutSens-Start)
+    where t1__' := <clean-layout-empty-symbols(
+                    | ""
+                    , FALSE()
+                    , FALSE()
+                    )
+                    ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                       <+ pp-one-Z(prettyprint-LayoutSens-Stmt)
+                                       <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                    ]
+
+  prettyprint-LayoutSens-Stmt :
+    Assign(t1__, t2__, t3__) -> [ H(
+                                    [SOpt(HS(), "0")]
+                                  , t1__'
+                                  )
+                                , t3__'
+                                ]
+    with t1__' := <clean-layout-empty-symbols(
+                   | ""
+                   , FALSE()
+                   , FALSE()
+                   )
+                   ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                      <+ pp-one-Z(prettyprint-LayoutSens-ID)
+                                      <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                   , S(" ")
+                                   , S("=")
+                                   , S(" ")
+                                   , <check-nonterminal-isEmpty ; id
+                                      <+ pp-one-Z(prettyprint-LayoutSens-INT)
+                                      <+ pp-one-Z(prettyprint-completion-aux)> t2__
+                                   ]
+    with t3__' := <clean-layout-empty-symbols(
+                   | ""
+                   , FALSE()
+                   , FALSE()
+                   )
+                   ; flatten-list
+                   ; pp-indent2(|"2")> [ <check-nonterminal-isEmpty ; id
+                                         <+ pp-one-Z(prettyprint-LayoutSens-MaybeWhere)
+                                         <+ pp-one-Z(prettyprint-completion-aux)> t3__
+                                      ]
+
+  is-LayoutSens-Stmt =
+    ?Assign(_, _, _)
+
+  LayoutSens-get-indent :
+    ( t@Assign(t1__, t2__, t3__)
+    , index
+    ) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           case ?3 :
+             indent := "  "
+           otherwise :
+             indent := ""
+         end
+
+  LayoutSens-get-separator :
+    ( t@Assign(t1__, t2__, t3__)
+    , index
+    ) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           case ?3 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  LayoutSens-get-leading-ws :
+    ( t@Assign(t1__, t2__, t3__)
+    , index
+    ) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           case ?3 :
+             ws := "\n  "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-LayoutSens-MaybeWhere :
+    t1__ -> [ H(
+                [SOpt(HS(), "0")]
+              , t1__'
+              )
+            ]
+    where not(is-LayoutSens-MaybeWhere)
+    where t1__' := <clean-layout-empty-symbols(
+                    | ""
+                    , FALSE()
+                    , FALSE()
+                    )
+                    ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                       <+ pp-one-Z(prettyprint-LayoutSens-Where)
+                                       <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                    ]
+
+  prettyprint-LayoutSens-MaybeWhere :
+    () -> [ H(
+              []
+            , [S("")]
+            )
+          ]
+
+  prettyprint-LayoutSens-Where :
+    Where(t1__) -> [ t2__'
+                   , H(
+                       [SOpt(HS(), "0")]
+                     , t1__'
+                     )
+                   ]
+    with t2__' := <clean-layout-empty-symbols(
+                   | ""
+                   , FALSE()
+                   , FALSE()
+                   )
+                   ; flatten-list
+                   ; pp-indent2(|"2")> [S("where")]
+    with t1__' := <clean-layout-empty-symbols(
+                   | ""
+                   , FALSE()
+                   , FALSE()
+                   )
+                   ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                      <+ pp-H-list(prettyprint-LayoutSens-Stmt)
+                                      <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                   ]
+
+
+  is-LayoutSens-Where =
+    ?Where(_)
+
+  pp-indent2(|is) = filter(gpp-is-real-vbox); (?[] <+ !I([SOpt(IS(), is)], H([SOpt(HS(), "0")], <id>)))
+  
+//  pp-indent2(|is) = filter(gpp-is-real-vbox); (?[] <+ !H([SOpt(HS(), is)], [S(""), H([SOpt(HS(), "0")], <map(indent-Z-boxes2(|is))>)]))
+//  
+//  indent-Z-boxes2(|is):
+//    H(opt, boxes{l*}){a*} -> H(opt, new-boxes{l*}){a*}
+//    with
+//      new-boxes := <map(indent-Z-boxes2(|is))> boxes
+//    
+//  indent-Z-boxes2(|is):
+//    V(opt, boxes{l*}){a*} -> V(opt, new-boxes{l*}){a*}
+//    with
+//      new-boxes := <map(indent-Z-boxes2(|is))> boxes
+//    
+//  indent-Z-boxes2(|is):
+//    s@S(_) -> s
+//    
+//  indent-Z-boxes2(|is):
+//    z@Z([], []) -> z
+//    
+//  indent-Z-boxes2(|is):
+//    Z([], [b{anno-b*} | bs]{l*}){a*} -> Z([], [b'{anno-b*} | bs']{l*}){a*}
+//    with
+//      b'  := <indent-Z-boxes2(|is)> b;
+//      bs' := <map(indent-boxes-list2(|is))> bs
+//      
+//  indent-boxes-list2(|is):   
+//    b{a*} -> H([SOpt(HS(), is)], [S(""), b'{a*}]) 
+//    where
+//      b' := <indent-Z-boxes2(|is)> b
+  
+  LayoutSens-get-indent :
+    (t@Where(t1__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Where"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  LayoutSens-get-separator :
+    (t@Where(t1__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Where"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  LayoutSens-get-leading-ws :
+    (t@Where(t1__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Where"> sort
+    with switch !index
+           case ?1 :
+             ws := "\n"
+           otherwise :
+             ws := ""
+         end
+
+  is-LayoutSens-Start =
+    fail
+
+  is-LayoutSens-Stmt =
+    fail
+
+  is-LayoutSens-MaybeWhere =
+    fail
+
+  is-LayoutSens-Where =
+    fail
+
+  prettyprint-LayoutSens-Start :
+    amb([h|hs]) -> <prettyprint-LayoutSens-Start> h
+
+  prettyprint-LayoutSens-Stmt :
+    amb([h|hs]) -> <prettyprint-LayoutSens-Stmt> h
+
+  prettyprint-LayoutSens-MaybeWhere :
+    amb([h|hs]) -> <prettyprint-LayoutSens-MaybeWhere> h
+
+  prettyprint-LayoutSens-Where :
+    amb([h|hs]) -> <prettyprint-LayoutSens-Where> h
+
+  prettyprint-LayoutSens-Start :
+    Start-Plhdr() -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [S("$Start")]
+                       )
+                     ]
+
+  is-LayoutSens-Start =
+    ?Start-Plhdr()
+
+  prettyprint-LayoutSens-ID :
+    ID-Plhdr() -> [ H(
+                      [SOpt(HS(), "0")]
+                    , [S("$ID")]
+                    )
+                  ]
+
+  is-LayoutSens-ID =
+    ?ID-Plhdr()
+
+  prettyprint-LayoutSens-INT :
+    INT-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$INT")]
+                     )
+                   ]
+
+  is-LayoutSens-INT =
+    ?INT-Plhdr()
+
+  prettyprint-LayoutSens-MaybeWhere :
+    MaybeWhere-Plhdr() -> [ H(
+                              [SOpt(HS(), "0")]
+                            , [S("$MaybeWhere")]
+                            )
+                          ]
+
+  is-LayoutSens-MaybeWhere =
+    ?MaybeWhere-Plhdr()
+
+  prettyprint-LayoutSens-Where :
+    Where-Plhdr() -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [S("$Where")]
+                       )
+                     ]
+
+  is-LayoutSens-Where =
+    ?Where-Plhdr()
+
+  prettyprint-LayoutSens-Stmt :
+    Stmt-Plhdr() -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Stmt")]
+                      )
+                    ]
+
+  is-LayoutSens-Stmt =
+    ?Stmt-Plhdr()
+
+  prettyprint-LayoutSens-Start :
+    Start-Plhdr(_) -> [ H(
+                          [SOpt(HS(), "0")]
+                        , [S("$Start")]
+                        )
+                      ]
+
+  is-LayoutSens-Start =
+    ?Start-Plhdr(_)
+
+  prettyprint-LayoutSens-ID :
+    ID-Plhdr(_) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$ID")]
+                     )
+                   ]
+
+  is-LayoutSens-ID =
+    ?ID-Plhdr(_)
+
+  prettyprint-LayoutSens-INT :
+    INT-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$INT")]
+                      )
+                    ]
+
+  is-LayoutSens-INT =
+    ?INT-Plhdr(_)
+
+  prettyprint-LayoutSens-MaybeWhere :
+    MaybeWhere-Plhdr(_) -> [ H(
+                               [SOpt(HS(), "0")]
+                             , [S("$MaybeWhere")]
+                             )
+                           ]
+
+  is-LayoutSens-MaybeWhere =
+    ?MaybeWhere-Plhdr(_)
+
+  prettyprint-LayoutSens-Where :
+    Where-Plhdr(_) -> [ H(
+                          [SOpt(HS(), "0")]
+                        , [S("$Where")]
+                        )
+                      ]
+
+  is-LayoutSens-Where =
+    ?Where-Plhdr(_)
+
+  prettyprint-LayoutSens-Stmt :
+    Stmt-Plhdr(_) -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [S("$Stmt")]
+                       )
+                     ]
+
+  is-LayoutSens-Stmt =
+    ?Stmt-Plhdr(_)

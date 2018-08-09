@@ -1,0 +1,24 @@
+x = 1
+    where
+  y = 2
+      where
+    z = 3
+
+x = 1
+    where
+y = 2
+    where
+z = 3
+
+
+x = 1
+  where
+  y = 2
+    where
+    z = 3
+
+x = 1
+  where
+y = 2
+  where
+z = 3

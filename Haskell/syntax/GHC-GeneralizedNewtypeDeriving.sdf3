@@ -1,0 +1,18 @@
+module GHC-GeneralizedNewtypeDeriving
+
+imports
+  GHC-Flexible-Stuff
+  Haskell-Types
+  Haskell-Type-Declarations
+  Haskell-Identifier-Sorts   
+
+context-free syntax
+
+  Topdecl.NewTypeDeclGeneralized = "newtype" Context? Type "=" Newconstr GeneralizedDeriving
+  GeneralizedDeriving.Deriving = "deriving" "(" {GDerive ","}+ ")" 
+  GDerive.GDerive = Qtycls AType+
+  GDerive = Qtycls 
+  GeneralizedDeriving = Deriving {reject}
+
+// HACK: to generate a pp as this production is still used sometimes
+  GeneralizedDeriving = Deriving 

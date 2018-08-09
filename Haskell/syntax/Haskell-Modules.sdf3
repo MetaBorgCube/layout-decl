@@ -1,0 +1,94 @@
+module Haskell-Modules
+
+imports
+  Haskell-Identifier-Sorts
+  Haskell-Import-Export
+  Haskell-Expressions
+
+context-free syntax
+
+  Module.Module = "module" Modid Exports? "where" body:Body
+//  {layout(pp-align "module" body)}
+  
+  Module.Program = Body 
+  
+  Topdecl = Decl 
+
+context-free syntax
+
+  Body.NoOffsideBody = "{" NoOffsideBody "}" {ignore-layout}
+  Body = OffsideBody 
+  Empty.Empty = "" 
+  NoOffsideBody.BodyEmpty = Empty Empty 
+  NoOffsideBody.BodyEmptyNoOffside = Empty NoOffsideTopdeclListSem 
+  NoOffsideBody.BodyNoOffsideEmpty = NoOffsideImportdeclListSem Empty 
+  NoOffsideBody.Body = NoOffsideImportdeclListSem ";" NoOffsideTopdeclList 
+  OffsideBody.BodyEmpty = Empty Empty 
+  OffsideBody.BodyEmptyOffside = Empty OffsideTopdeclList 
+  OffsideBody.BodyOffsideEmpty = OffsideImportdeclList Empty 
+  
+  OffsideBody.Body = imp1:OffsideImportdeclList imp2:OffsideTopdeclList {layout(align imp1 imp2)} // {layout(1.first.col == 2.first.col)} 
+
+  NoOffsideImportdecl = Importdecl
+  NoOffsideImportdecl.Semi = NoOffsideImportdecl ";" 
+  
+
+context-free syntax
+
+  NoOffsideImportdeclList = {NoOffsideImportdecl ";"}+ 
+  NoOffsideImportdeclListSem = NoOffsideImportdeclList 
+  NoOffsideImportdeclListSem.Semi = ";" NoOffsideImportdeclListSem 
+  
+  NoOffsideTopdecl = Topdecl
+  NoOffsideTopdecl.Semi = NoOffsideTopdecl ";" {prefer}
+
+
+context-free syntax
+
+  NoOffsideTopdeclList = {NoOffsideTopdecl ";"}+ 
+  NoOffsideTopdeclListSem = NoOffsideTopdeclList 
+  NoOffsideTopdeclListSem.Semi = ";" NoOffsideTopdeclListSem 
+  
+  OffsideImportdecl = imp:Importdecl {layout(offside imp)} // {layout(1.left.col > 1.first.col)}
+  OffsideImportdecl.SemiAfter = imp:OffsideImportdecl ";" {layout(indent imp ";")} // {layout(2.first.col > 1.first.col)} 
+  OffsideImportdecl.SemiBefore = ";" imp:OffsideImportdecl {layout(indent ";" imp)} // {layout(2.first.col > 1.first.col)} 
+  OffsideImportdecl.ImportdeclSeq = imp1:Importdecl ";" imp2:OffsideImportdecl {layout(offside imp1  // {layout(1.left.col > 1.first.col &&
+                                                                                    && indent imp1 ";" && indent imp1 imp2)} // 2.first.col > 1.first.col && 3.first.col > 1.first.col)} 
+                                                                           
+                                                                           
+  
+  
+
+%% Offside import declarations
+  context-free priorities
+    OffsideImportdecl.SemiAfter
+  >
+    OffsideImportdecl.SemiBefore
+  >
+    OffsideImportdecl.ImportdeclSeq
+
+context-free syntax
+
+  OffsideImportdeclList = OffsideImportdecl+ {layout(align-list 1)} 
+//  OffsideImportdeclList.ImportdeclSeq = imp1:OffsideImportdecl imp2:OffsideImportdeclList {layout(align imp1 imp2)}
+  
+  OffsideTopdecl = topDecl:Topdecl {layout(offside topDecl)} // {layout(1.left.col > 1.first.col)} 
+  OffsideTopdecl.SemiBefore = ";" topDecl:OffsideTopdecl {layout(indent ";" topDecl)} // {layout(2.first.col > 1.first.col)}
+  OffsideTopdecl.SemiAfter = topDecl:OffsideTopdecl ";" {prefer, layout(indent topDecl ";")} // {prefer, layout(2.first.col > 1.first.col)} 
+  OffsideTopdecl.TopdeclSeqOffside = topDecl1:Topdecl ";" topDecl2:OffsideTopdecl {layout(offside topDecl1 // {layout(1.left.col > 1.first.col && 
+                                                                                && indent topDecl1 ";" && indent topDecl1 topDecl2)} // 2.first.col > 1.first.col && 3.first.col > 1.first.col)} 
+                                                           
+  
+  
+context-free priorities
+
+  OffsideTopdecl.SemiAfter
+  >
+  OffsideTopdecl.SemiBefore
+  >
+  OffsideTopdecl.TopdeclSeqOffside
+                      
+context-free syntax
+
+  OffsideTopdeclList = OffsideTopdecl+ {layout(align-list 1)} 
+//  OffsideTopdeclList.TopdeclSeq = topDecl1:OffsideTopdecl topDecl2:OffsideTopdeclList {layout(align topDecl1 topDecl2)} // {layout(1.first.col == 2.first.col)}

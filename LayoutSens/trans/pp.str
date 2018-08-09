@@ -1,0 +1,107 @@
+module pp
+
+imports
+
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/editor/refactoring/-
+  pp/LayoutSens-parenthesize
+  pp/LayoutSens-pp
+  libspoofax/core/parse
+  libspoofax/term/annotation
+  libspoofax/stratego/debug
+  annotatebox
+
+rules
+
+  editor-format:
+    (node, _, ast, path, project-path) -> (filename, result)
+    with
+      ext      := <get-extension> path
+    ; filename := <guarantee-extension(|$[pp.[ext]])> path
+    ; result   := <pp-debug> node
+    
+  editor-format-to-box:
+    (node, _, ast, path, project-path) -> (filename, result)
+    with
+      ext      := <get-extension> path
+    ; filename := <guarantee-extension(|$[boxpp.aterm])> path
+    ; result   := <pp-debug-to-box> node
+    
+  editor-format-no-fix:
+    (node, _, ast, path, project-path) -> (filename, result)
+    with
+      ext      := <get-extension> path
+    ; filename := <guarantee-extension(|$[pp.no-fix.[ext]])> path
+    ; result   := <pp-debug-no-fix> node
+    
+    apply-layout-constraints-to-box = prim("SSL_EXT_apply_layout_constraints_pp") <+ id
+
+rules
+  
+  pp-LayoutSens-string =
+    parenthesize-LayoutSens
+    ; prettyprint-LayoutSens-start-symbols
+    ; !V([], <id>)
+//    ; !Z([], [S("foo"), S("bar"), S("baz"), S("baaz")])
+    ; annotate-box-line-col(|Position(1, 1))
+    ; apply-layout-constraints-to-box
+    ; box2text-string(|120) 
+
+  
+      
+  pp-LayoutSens-string-to-box =
+    parenthesize-LayoutSens
+    ; prettyprint-LayoutSens-start-symbols
+    ; !V([], <id>)
+    ; annotate-box-line-col(|Position(1, 1))
+//    ; ppdebug(|"annotated box ")
+    ; apply-layout-constraints-to-box
+//    ; box2text-string(|120) 
+
+  pp-LayoutSens-string-no-fix =
+    parenthesize-LayoutSens
+    ; prettyprint-LayoutSens-start-symbols
+    ; !V([], <id>)
+    ; annotate-box-line-col(|Position(1, 1))
+//    ; ppdebug(|"annotated box ")
+//    ; apply-layout-constraints-to-box
+    ; box2text-string(|120) 
+    
+      
+  pp-partial-LayoutSens-string =
+    parenthesize-LayoutSens
+    ; prettyprint-LayoutSens
+    ; !V([], <id>)
+    ; box2text-string(|120) 
+    
+  pp-partial-LayoutSens-string(|sort) =
+    parenthesize-LayoutSens
+    ; prettyprint-LayoutSens(|sort)
+    ; !V([], <id>)
+    ; box2text-string(|120)  
+      
+  pp-debug :
+    ast -> result
+    with
+       result := <pp-LayoutSens-string> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-LayoutSens-string); debug(!"cannot pp ")))> ast
+    ;  result := ""
+    
+  pp-debug-no-fix :
+    ast -> result
+    with
+       result := <pp-LayoutSens-string-no-fix> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-LayoutSens-string-no-fix); debug(!"cannot pp ")))> ast
+    ;  result := ""
+    
+  pp-debug-to-box :
+    ast -> result
+    with
+       result := <pp-LayoutSens-string-to-box> ast
+    <+ <bottomup(try(not(is-string); not(is-list); not(pp-LayoutSens-string-to-box); debug(!"cannot pp ")))> ast
+    ;  result := ""
+
+rules
+  
+  construct-textual-change = construct-textual-change(pp-partial-LayoutSens-string, parenthesize, override-reconstruction, resugar)

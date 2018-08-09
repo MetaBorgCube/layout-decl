@@ -1,0 +1,1 @@
+Module("signatures/Haskell-Keywords-sig",[Signature([Constructors([OpDeclInj(FunType([ConstType(SortNoArgs("String"))],ConstType(SortNoArgs("ReservedId")))),OpDeclInj(FunType([ConstType(SortNoArgs("String"))],ConstType(SortNoArgs("ReservedId0")))),OpDeclInj(FunType([ConstType(SortNoArgs("String"))],ConstType(SortNoArgs("ReservedOp"))))])])])

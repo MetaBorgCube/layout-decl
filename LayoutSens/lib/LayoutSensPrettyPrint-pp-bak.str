@@ -1,0 +1,479 @@
+module pp/LayoutSensPrettyPrint-pp
+
+imports
+  libstratego-gpp
+  libspoofax/sdf/pp
+  libspoofax/term/origin
+  libspoofax/term/annotation
+  libstratego-sglr
+  libstratego-sglr
+  signatures/LayoutSensPrettyPrint-sig
+
+
+imports
+  signatures/Common-sig
+
+
+imports
+  pp/Common-pp
+
+
+strategies
+  prettyprint-example =
+    prettyprint-LayoutSens
+
+  prettyprint-LayoutSens =
+    fail
+
+  prettyprint-LayoutSens(|sort) =
+    fail
+
+
+strategies
+  prettyprint-SDF-start-symbols =
+    prettyprint-LayoutSens-start-symbols
+
+  prettyprint-LayoutSens-start-symbols =
+    fail
+
+
+strategies
+  prettyprint-LayoutSens-start-symbols =
+    prettyprint-LayoutSens-Start
+
+
+strategies
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-Start
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-Stmt
+
+  prettyprint-LayoutSens =
+    prettyprint-LayoutSens-Exp
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-Start>
+    where <?"Start"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-Stmt>
+    where <?"Stmt"> sort
+
+  prettyprint-LayoutSens(|sort):
+    t -> <prettyprint-LayoutSens-Exp>
+    where <?"Exp"> sort
+
+  prettyprint-LayoutSens-Start :
+    t1__ -> [ H(
+                [SOpt(HS(), "0")]
+              , t1__'
+              )
+            ]
+    where not(is-LayoutSens-Start)
+    where t1__' := <clean-layout-empty-symbols(
+                    | ""
+                    , FALSE()
+                    , FALSE()
+                    )
+                    ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                       <+ pp-one-Z(prettyprint-LayoutSens-Stmt)
+                                       <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                    ]
+
+  prettyprint-LayoutSens-Stmt :
+    IfElse(exp__, then__, else__) -> <add-annotations(
+                                      | [ Align(
+                                            LiteralRef("if")
+                                          , [LiteralRef("else")]
+                                          )
+                                        , Align(
+                                            LabelRef("then")
+                                          , [LabelRef("else")]
+                                          )
+                                        ]
+                                      )> [ H(
+                                             [SOpt(HS(), "0")]
+                                           , exp__'
+                                           )
+                                         , then__'
+                                         , H(
+                                             [SOpt(HS(), "0")]
+                                           , else__'
+                                           )
+                                         ]
+    with exp__' := <clean-layout-empty-symbols(
+                    | ""
+                    , FALSE()
+                    , FALSE()
+                    )
+                    ; flatten-list> [ <add-annotations(|[LiteralRef("if")])> S("if")
+                                    , S(" ")
+                                    , <check-nonterminal-isEmpty ; id
+                                       <+ pp-one-Z(prettyprint-LayoutSens-Exp)
+                                       <+ pp-one-Z(prettyprint-completion-aux)> exp__
+                                    , S(" ")
+                                    , S("then")
+                                    ]
+    with then__' := <clean-layout-empty-symbols(
+                     | ""
+                     , FALSE()
+                     , FALSE()
+                     )
+                     ; flatten-list
+                     ; pp-indent(|"2")> [ <(check-nonterminal-isEmpty ; id
+                                            <+ pp-H-list(prettyprint-LayoutSens-Stmt)
+                                            <+ pp-one-Z(prettyprint-completion-aux))
+                                           ; add-annotations(|[LabelRef("then")])> then__
+                                        ]
+    with else__' := <clean-layout-empty-symbols(
+                     | ""
+                     , FALSE()
+                     , FALSE()
+                     )
+                     ; flatten-list> [ <add-annotations(|[LiteralRef("else")])> S("else")
+                                     , S(" ")
+                                     , <(check-nonterminal-isEmpty ; id
+                                         <+ pp-H-list(prettyprint-LayoutSens-Stmt)
+                                         <+ pp-one-Z(prettyprint-completion-aux))
+                                        ; add-annotations(|[LabelRef("else")])> else__
+                                     ]
+
+  is-LayoutSens-Stmt =
+    ?IfElse(_, _, _)
+    
+//  pp-indent2(|is) = filter(gpp-is-real-vbox); (?[] <+ !H([SOpt(HS(), is)], [S(""), H([SOpt(HS(), "0")], <map(debug(!"before "); indent-Z-boxes(|is); debug(!"after "))>)]))
+//  
+//  indent-Z-boxes(|is):
+//    H(opt, boxes{l*}){a*} -> H(opt, <map(indent-Z-boxes(|is))> boxes{l*}){a*}
+//    
+//  indent-Z-boxes(|is):
+//    V(opt, boxes{l*}){a*} -> V(opt, <map(indent-Z-boxes(|is))> boxes{l*}){a*}
+//    
+//  indent-Z-boxes(|is):
+//    s@S(_) -> s
+//    
+//  indent-Z-boxes(|is):
+//    Z([], [b | bs]{l*}) -> Z([], [b | bs']{l*})
+//    with
+//      bs' := <map(debug(!"before z "); indent-boxes-list(|is); debug(!"after z "))> bs
+//      
+//  indent-Z-boxes(|is):
+//    z@Z([], []) -> z
+//      
+//  indent-boxes-list(|is):   
+//    b -> H([SOpt(HS(), is)], [S(""), <indent-Z-boxes(|is)> b]) 
+
+  LayoutSens-get-indent :
+    ( t@IfElse(exp__, then__, else__)
+    , index
+    ) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := "  "
+           case ?3 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  LayoutSens-get-separator :
+    ( t@IfElse(exp__, then__, else__)
+    , index
+    ) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           case ?3 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  LayoutSens-get-leading-ws :
+    ( t@IfElse(exp__, then__, else__)
+    , index
+    ) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             ws := " "
+           case ?2 :
+             ws := "\n  "
+           case ?3 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-LayoutSens-Stmt :
+    Assign(t1__, t2__) -> [ H(
+                              [SOpt(HS(), "0")]
+                            , t1__'
+                            )
+                          ]
+    with t1__' := <clean-layout-empty-symbols(
+                   | ""
+                   , FALSE()
+                   , FALSE()
+                   )
+                   ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                      <+ pp-one-Z(prettyprint-LayoutSens-ID)
+                                      <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                   , S(" ")
+                                   , S("=")
+                                   , S(" ")
+                                   , <check-nonterminal-isEmpty ; id
+                                      <+ pp-one-Z(prettyprint-LayoutSens-Exp)
+                                      <+ pp-one-Z(prettyprint-completion-aux)> t2__
+                                   ]
+
+  is-LayoutSens-Stmt =
+    ?Assign(_, _)
+
+  LayoutSens-get-indent :
+    (t@Assign(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  LayoutSens-get-separator :
+    (t@Assign(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  LayoutSens-get-leading-ws :
+    (t@Assign(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Stmt"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-LayoutSens-Exp :
+    Add(t1__, t2__) -> [ H(
+                           [SOpt(HS(), "0")]
+                         , t1__'
+                         )
+                       ]
+    with t1__' := <clean-layout-empty-symbols(
+                   | ""
+                   , FALSE()
+                   , FALSE()
+                   )
+                   ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                      <+ pp-one-Z(prettyprint-LayoutSens-Exp)
+                                      <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                   , S(" ")
+                                   , S("+")
+                                   , S(" ")
+                                   , <check-nonterminal-isEmpty ; id
+                                      <+ pp-one-Z(prettyprint-LayoutSens-Exp)
+                                      <+ pp-one-Z(prettyprint-completion-aux)> t2__
+                                   ]
+
+  is-LayoutSens-Exp =
+    ?Add(_, _)
+
+  LayoutSens-get-indent :
+    (t@Add(t1__, t2__), index) -> indent
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             indent := ""
+           case ?2 :
+             indent := ""
+           otherwise :
+             indent := ""
+         end
+
+  LayoutSens-get-separator :
+    (t@Add(t1__, t2__), index) -> separator
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             separator := ""
+           case ?2 :
+             separator := ""
+           otherwise :
+             separator := ""
+         end
+
+  LayoutSens-get-leading-ws :
+    (t@Add(t1__, t2__), index) -> ws
+    where sort := <ia-get-sort> t
+          ; <?"Exp"> sort
+    with switch !index
+           case ?1 :
+             ws := ""
+           case ?2 :
+             ws := " "
+           otherwise :
+             ws := ""
+         end
+
+  prettyprint-LayoutSens-Exp :
+    t1__ -> [ H(
+                [SOpt(HS(), "0")]
+              , t1__'
+              )
+            ]
+    where not(is-LayoutSens-Exp)
+    where t1__' := <clean-layout-empty-symbols(
+                    | ""
+                    , FALSE()
+                    , FALSE()
+                    )
+                    ; flatten-list> [ <check-nonterminal-isEmpty ; id
+                                       <+ pp-one-Z(prettyprint-LayoutSens-INT)
+                                       <+ pp-one-Z(prettyprint-completion-aux)> t1__
+                                    ]
+
+  is-LayoutSens-Start =
+    fail
+
+  is-LayoutSens-Stmt =
+    fail
+
+  is-LayoutSens-Exp =
+    fail
+
+  prettyprint-LayoutSens-Start :
+    amb([h|hs]) -> <prettyprint-LayoutSens-Start> h
+
+  prettyprint-LayoutSens-Stmt :
+    amb([h|hs]) -> <prettyprint-LayoutSens-Stmt> h
+
+  prettyprint-LayoutSens-Exp :
+    amb([h|hs]) -> <prettyprint-LayoutSens-Exp> h
+
+  prettyprint-LayoutSens-Start :
+    Start-Plhdr() -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [S("$Start")]
+                       )
+                     ]
+
+  is-LayoutSens-Start =
+    ?Start-Plhdr()
+
+  prettyprint-LayoutSens-Stmt :
+    Stmt-Plhdr() -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Stmt")]
+                      )
+                    ]
+
+  is-LayoutSens-Stmt =
+    ?Stmt-Plhdr()
+
+  prettyprint-LayoutSens-ID :
+    ID-Plhdr() -> [ H(
+                      [SOpt(HS(), "0")]
+                    , [S("$ID")]
+                    )
+                  ]
+
+  is-LayoutSens-ID =
+    ?ID-Plhdr()
+
+  prettyprint-LayoutSens-Exp :
+    Exp-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$Exp")]
+                     )
+                   ]
+
+  is-LayoutSens-Exp =
+    ?Exp-Plhdr()
+
+  prettyprint-LayoutSens-INT :
+    INT-Plhdr() -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$INT")]
+                     )
+                   ]
+
+  is-LayoutSens-INT =
+    ?INT-Plhdr()
+
+  prettyprint-LayoutSens-Start :
+    Start-Plhdr(_) -> [ H(
+                          [SOpt(HS(), "0")]
+                        , [S("$Start")]
+                        )
+                      ]
+
+  is-LayoutSens-Start =
+    ?Start-Plhdr(_)
+
+  prettyprint-LayoutSens-Stmt :
+    Stmt-Plhdr(_) -> [ H(
+                         [SOpt(HS(), "0")]
+                       , [S("$Stmt")]
+                       )
+                     ]
+
+  is-LayoutSens-Stmt =
+    ?Stmt-Plhdr(_)
+
+  prettyprint-LayoutSens-ID :
+    ID-Plhdr(_) -> [ H(
+                       [SOpt(HS(), "0")]
+                     , [S("$ID")]
+                     )
+                   ]
+
+  is-LayoutSens-ID =
+    ?ID-Plhdr(_)
+
+  prettyprint-LayoutSens-Exp :
+    Exp-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$Exp")]
+                      )
+                    ]
+
+  is-LayoutSens-Exp =
+    ?Exp-Plhdr(_)
+
+  prettyprint-LayoutSens-INT :
+    INT-Plhdr(_) -> [ H(
+                        [SOpt(HS(), "0")]
+                      , [S("$INT")]
+                      )
+                    ]
+
+  is-LayoutSens-INT =
+    ?INT-Plhdr(_)

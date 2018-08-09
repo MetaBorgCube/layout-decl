@@ -1,0 +1,5 @@
+Benchmark                                                    (a_lt)  Mode  Cnt    Score   Error  Units
+LayoutSensitiveParsingPerformance.parseFile                ORIGINAL  avgt   10  862.415 ± 1.164   s/op
+LayoutSensitiveParsingPerformance.parseFile                EXPLICIT  avgt   10  513.364 ± 2.393   s/op
+LayoutSensitiveParsingPerformance.parseFileNoLongestMatch  ORIGINAL  avgt   10  320.087 ± 0.569   s/op
+LayoutSensitiveParsingPerformance.parseFileNoLongestMatch  EXPLICIT  avgt   10  227.186 ± 0.375   s/op

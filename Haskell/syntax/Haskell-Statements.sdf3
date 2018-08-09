@@ -1,0 +1,53 @@
+module Haskell-Statements
+
+imports
+  Haskell-Expressions
+  Haskell-Patterns
+  Haskell-Identifier-Sorts
+  Haskell-Value-Definitions
+
+context-free syntax
+
+  Stmt.BindStmt = Pat "<-" Exp 
+  Stmt.ExpStmt = Exp 
+  Stmt.LetStmt = "let" Declbinds 
+  Fbind.FBind = Qvar "=" Exp 
+
+context-free syntax
+
+  StmtList.StmtList = NoOffsideStmtBlock 
+  StmtList.StmtListOffside = OffsideStmt+ {layout(align-list 1)}
+  NoOffsideStmtBlock.StmtBlock = "{" NoOffsideStmtListSem "}" {ignore-layout}
+  
+  NoOffsideStmt = Stmt 
+  NoOffsideStmt.NoOffsideSemi = NoOffsideStmt ";" 
+
+context-free syntax
+
+  NoOffsideStmtList = {NoOffsideStmt ";"}+ 
+  NoOffsideStmtListSem = NoOffsideStmtList 
+  NoOffsideStmtListSem.SemiBefore = ";" NoOffsideStmtListSem 
+
+  OffsideStmt = stmt:Stmt {layout(offside stmt)} // {layout(1.first.col < 1.left.col)} 
+  OffsideStmt.SemiAfter = stmt:OffsideStmt ";" {layout(indent stmt ";")} // {layout(1.first.col < 2.first.col)}
+  OffsideStmt.SemiBefore = ";" stmt:OffsideStmt {layout(indent ";" stmt)} // {layout(1.first.col < 2.first.col)} 
+  OffsideStmt.StmtSeq = stmt1:OffsideStmt ";" stmt2:Stmt {layout(indent stmt1 ";" && indent stmt1 stmt2 // {layout(1.first.col < 2.first.col && 1.first.col < 3.first.col && 
+                                                              && offside stmt1 stmt2)}          // 1.first.col < 3.left.col)} 
+  
+  
+context-free priorities
+  OffsideStmt.SemiAfter
+  >
+  OffsideStmt.SemiBefore
+  >
+  OffsideStmt.StmtSeq
+  
+//context-free syntax
+//
+//  OffsideStmtList = OffsideStmt 
+//  OffsideStmtList.StmtSeq = <
+//    <stmt1:OffsideStmt> 
+//    <stmt2:OffsideStmtList>> {layout(align stmt1 stmt2)} // {layout(1.first.col == 2.first.col)}
+
+
+

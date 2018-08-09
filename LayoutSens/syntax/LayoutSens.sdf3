@@ -1,0 +1,24 @@
+module LayoutSens
+
+imports
+  
+  Common  
+  
+context-free start-symbols
+  Start
+  
+context-free syntax
+
+  Start = Stmt 
+
+  Stmt.IfElse = "if" Exp "then" then:Stmt "else" else:Stmt 
+  {layout(pp-newline-indent "if" then && 
+          pp-align "if" "else" && 
+          align then else )}
+  
+  Stmt.Assign = ID "=" exp:Exp 
+  {layout(offside "=" exp)}
+  
+  Exp.Add = Exp "+" Exp {left}
+  
+  Exp = INT 

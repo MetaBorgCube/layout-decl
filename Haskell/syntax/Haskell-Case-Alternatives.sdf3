@@ -1,0 +1,50 @@
+module Haskell-Case-Alternatives
+
+imports  
+  Haskell-Value-Definitions 
+  Haskell-Patterns
+  Haskell-Expressions
+
+context-free syntax 
+
+  Alt.Alt     = Pat "->" Exp MaybeWhere
+  Alt.GdAlt   = Pat Gdpat+ MaybeWhere
+  Gdpat.GdPat = "|" Exp "->" Exp 
+
+context-free syntax
+
+  AltList.AltList = NoOffsideAltBlock 
+  AltList.AltListOffside = OffsideAltList 
+  NoOffsideAltBlock.AltBlock = "{" NoOffsideAltList "}"  {ignore-layout}
+  NoOffsideAlt.NoOffsideAlt = NoOffsideAlt ";"
+  NoOffsideAlt = Alt
+
+context-free syntax
+
+  NoOffsideAltList = {NoOffsideAlt ";"}+ 
+  NoOffsideAltListSem = NoOffsideAltList 
+  NoOffsideAltListSem.Semi = ";" NoOffsideAltListSem 
+  
+context-free syntax
+  
+  OffsideAlt            = alt:Alt             {layout(offside alt)} // {layout(1.left.col > 1.first.col)} 
+  OffsideAlt.SemiAfter  = alt:OffsideAlt ";"  {layout(indent alt ";")} // {layout(2.first.col > 1.first.col)} 
+  OffsideAlt.SemiBefore = ";" alt:OffsideAlt  {layout(indent ";" alt )} // {layout(2.first.col > 1.first.col)} 
+  OffsideAlt.AltSeqOffside     = alt1:OffsideAlt ";" alt2:Alt {layout(indent alt1 ";" && indent alt1 alt2 &&
+                                                               offside alt1 alt2)} // {layout(1.first.col < 2.first.col && 1.first.col < 3.first.col 
+                                                                                    //      && 1.first.col < 3.left.col)} 
+    
+context-free priorities
+
+  OffsideAlt.SemiAfter
+  >
+  OffsideAlt.SemiBefore 
+  >  
+  OffsideAlt.AltSeqOffside
+    
+context-free syntax
+
+context-free syntax
+
+  OffsideAltList = OffsideAlt+ {layout(align-list 1)} 
+//  OffsideAltList.AltSeq = alt1:OffsideAlt alt2:OffsideAltList {layout(align alt1 alt2)} 

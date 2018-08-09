@@ -1,0 +1,15 @@
+module Haskell-List-Comprehensions
+
+imports
+  Haskell-Qualifiers
+
+context-free syntax
+
+  Exp.List = "[" List "]" 
+  List = Lexps 
+  List.Dots = Exp ".." 
+  List.Colon = Exp "," Exp ".." 
+  List.Range = Exp ".." Exp 
+  List.CommaRange = Exp "," Exp ".." Exp 
+  List.SuchThat = Exp "|" Quals 
+  Lexps.Exps = {Exp ","}+

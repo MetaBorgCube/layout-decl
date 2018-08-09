@@ -1,0 +1,5 @@
+4Blocks/4Blocks-0.2/Interface/CommandKeys.hs
+4Blocks/4Blocks-0.2/Interface/KeyEvents.hs
+4Blocks/4Blocks-0.2/Interface/MainWindow.hs
+4Blocks/4Blocks-0.2/Interface/OnePlayerModeWindow.hs
+INblobs/INblobs-0.1.1/src/INReductionStrategies.hs

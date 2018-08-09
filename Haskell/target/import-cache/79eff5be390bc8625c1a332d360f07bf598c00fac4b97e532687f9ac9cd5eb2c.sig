@@ -1,0 +1,1 @@
+Module("libspoofax/editor/completion/legacy",[Signature([Constructors([OpDecl("COMPLETION",FunType([ConstType(SortNoArgs("String"))],ConstType(SortNoArgs("Term")))),OpDecl("NOCONTEXT",FunType([ConstType(SortNoArgs("Term"))],ConstType(SortNoArgs("Term"))))])])])

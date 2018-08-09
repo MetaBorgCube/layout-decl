@@ -1,0 +1,48 @@
+module Haskell-Identifiers
+
+imports
+  Haskell-Keywords
+
+lexical syntax
+
+  VARID = [a-z] [A-Za-z0-9\'\_]* 
+  VARID = [\_] [A-Za-z0-9\'\_]+ 
+  CONID = [A-Z] [A-Za-z0-9\'\_]* 
+  Symbol = [\!\#\$\%\&\*\+\.\/]\/[\<\=\>\?\@\\\^\|\-\~] 
+  VARSYM = Symbol (Symbol | [\:])*  
+  CONSYM = [\:] (Symbol | [\:])+
+//  VARSYM = ReservedOp {reject}
+  VARSYM = ".." {reject}
+  VARSYM = ":" {reject}
+  VARSYM = "::" {reject}
+  VARSYM = "=" {reject}
+  VARSYM = "\\" {reject}
+  VARSYM = "|" {reject}
+  VARSYM = "<-" {reject}
+  VARSYM = "->" {reject}
+  VARSYM = "@" {reject}
+  VARSYM = "~" {reject}
+  VARSYM = "=" {reject}
+//  CONSYM = ReservedOp {reject}
+  CONSYM = ".." {reject}
+  CONSYM = ":" {reject}
+  CONSYM = "::" {reject}
+  CONSYM = "=" {reject}
+  CONSYM = "\\" {reject}
+  CONSYM = "|" {reject}
+  CONSYM = "<-" {reject}
+  CONSYM = "->" {reject}
+  CONSYM = "@" {reject}
+  CONSYM = "~" {reject}
+  CONSYM = "=" {reject}
+  
+  
+  CONSOP = ":" 
+
+lexical restrictions
+
+  CONID
+  VARID -/- [A-Za-z0-9\'\_]
+  VARSYM -/- [\!\#\$\%\&\*\+\.\/]\/[\<\=\>\?\@\\\^\|\-\~]
+  CONSYM -/- [\!\#\$\%\&\*\+\.\/]\/[\<\=\>\?\@\\\^\|\-\~]
+  CONSOP -/- [\:]\/[\!\#\$\%\&\*\+\.\/]\/[\<\=\>\?\@\\\^\|\-\~]

@@ -1,0 +1,11 @@
+4Blocks/4Blocks-0.2/4Blocks.hs
+4Blocks/4Blocks-0.2/Core/Brick.hs
+4Blocks/4Blocks-0.2/Core/Colour.hs
+4Blocks/4Blocks-0.2/Core/ColouredPoint.hs
+4Blocks/4Blocks-0.2/Core/Commands.hs
+4Blocks/4Blocks-0.2/Core/Direction.hs
+4Blocks/4Blocks-0.2/Core/Game.hs
+4Blocks/4Blocks-0.2/Core/Level.hs
+4Blocks/4Blocks-0.2/Core/Shape.hs
+4Blocks/4Blocks-0.2/Core/SimplePoint.hs
+4Blocks/4Blocks-0.2/Core/Status.hs

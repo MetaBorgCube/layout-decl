@@ -1,0 +1,329 @@
+module annotatebox
+
+imports 
+  libstratego-gpp
+  libspoofax/term/annotation
+  libspoofax/stratego/debug
+
+signature constructors
+  
+  Position           : INT * INT -> Pos
+  PositionWithLayout : INT * INT -> Pos
+
+rules 
+    
+  annotate-box-line-col(|p) :
+   t@V([SOpt(VS(), vs)], []) -> t
+    
+  annotate-box-line-col(|p) :
+    t@V([], []) -> t
+    
+  annotate-box-line-col(|p) :
+    V([SOpt(VS(), vs)], [b | bs]{l*}){a*} -> <try(annotate-top-level-box(|new-list)); add-annotation(|PositionWithLayout(line, column))> V([SOpt(VS(), vs)], new-list){a*}
+    with
+      if <?[]> bs then
+        p' := p
+      else
+        p' := <get-end-position(|p); inc-line-position(|<string-to-int> vs, <?Position(_, <id>)> p)> b
+      end;
+      new-list := [ b | <annotate-box-line-col-vertical(|p', <string-to-int> vs)> bs]{l*};
+      <?Position(line, column)> p
+      
+  annotate-box-line-col(|p) :
+    V([], [b | bs]{l*}){a*} -> <try(annotate-top-level-box(|new-list)); add-annotation(|PositionWithLayout(line, column))> V([], new-list){a*}
+    with
+//      debug(!"annotate line col v ");
+      if <?[]> bs then
+        p' := p
+      else
+        p' := <get-end-position(|p); inc-line-position(|1, <?Position(_, <id>)> p)> b
+      end;
+      new-list := [ <annotate-box-line-col(|p)> b | <annotate-box-line-col-vertical(|p', 1)> bs]{l*};
+      <?Position(line, column)> p
+      
+  annotate-box-line-col(|p) :
+    t@H([SOpt(HS(), hs)], []) -> t
+    
+  annotate-box-line-col(|p) :
+    t@H([], []) -> t
+    
+  annotate-box-line-col(|p) :
+   t@H([SOpt(HS(), hs)], [b | bs]{l*}){a*} -> <try(annotate-top-level-box(|new-list)); add-annotation(|PositionWithLayout(line, column))> H([SOpt(HS(), hs)], new-list){a*}
+    with
+//      debug(!"annotate line col h ");
+      if <?[]> bs then
+        p' := p
+      else
+        p' := <get-end-position(|p); inc-column-position(|<string-to-int> hs)> b
+      end;
+      new-list := [ <annotate-box-line-col(|p)> b | <annotate-box-line-col-horizontal(|p', <string-to-int> hs)> bs]{l*};
+      <?Position(line, column)> p
+      
+  annotate-box-line-col(|p) :
+    H([], [b | bs]{l*}){a*} -> <try(annotate-top-level-box(|new-list)); add-annotation(|PositionWithLayout(line, column))> H([], new-list){a*}
+    with
+//      debug(!"annotate line col h[] ");
+      if <?[]> bs then
+        p' := p
+      else
+        p' := <get-end-position(|p); inc-column-position(|1)> b 
+      end;
+      new-list := [ <annotate-box-line-col(|p)> b | <annotate-box-line-col-horizontal(|p', 1)> bs]{l*};
+      <?Position(line, column)> p
+  
+  annotate-box-line-col(|p) :
+    Z([], [b | bs]{l*}){a*} -> <try(annotate-top-level-box(|new-list)); add-annotation(|PositionWithLayout(line, column))> Z([], new-list){a*}
+    with
+//      debug(!"annotate line col z ");
+      if <?[]> bs then
+        p' := p
+      else
+        p' := <get-end-position(|p); inc-line-position(|1)> b 
+      end;
+      new-list := [ <annotate-box-line-col(|p)> b | <annotate-box-line-col-vertical-z(|p', 1)> bs]{l*};
+      <?Position(line, column)> p
+      
+  annotate-box-line-col(|p) :
+    t@Z([], []) -> t
+    
+//  annotate-box-line-col(|p) :
+//    I([SOpt(IS(), is)], hbox{l*}){a*} -> <try(annotate-top-level-box(|new-box)); add-annotation(|PositionWithLayout(line, column))> I([SOpt(IS(), is)], new-box){a*}
+//    with
+//      new-box := <annotate-box-line-col(|p); indent-boxes(|<string-to-int> is)> hbox{l*};
+//      <?Position(line, column)> p
+//      
+//  annotate-box-line-col(|p) :
+//    RI([SOpt(IS(), is)], zbox{l*}){a*} -> <try(annotate-top-level-box(|new-box)); add-annotation(|PositionWithLayout(line, column))> RI([SOpt(IS(), is)], new-box){a*}
+//    with
+//      new-box := <annotate-box-line-col(|p); replace-indent-boxes(|<string-to-int> is)> zbox{l*};
+//      <?Position(line, column)> p    
+//      
+//  indent-boxes(|is):
+//    H(opt, boxes{b*}){a*} -> <try(annotate-top-level-box-replace(|new-boxes))> H(opt, new-boxes{b*}){a'*}
+//    with
+//      a'*       := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-boxes := <map(indent-boxes(|is)) <+ id> boxes
+//      
+//  indent-boxes(|is):
+//    V(opt, boxes{b*}){a*} -> <try(annotate-top-level-box-replace(|new-boxes))> V(opt, new-boxes{b*}){a'*}
+//    with
+//      a'*       := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-boxes := <map(indent-boxes(|is)) <+ id> boxes
+//      
+//  indent-boxes(|is):
+//    Z(opt, boxes{b*}){a*} -> <try(annotate-top-level-box-replace(|new-boxes)); replace-annotation(?Indented(_)|new-indent)> Z(opt, new-boxes{b*}){a'*}
+//    with
+//      a'*       := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-boxes := <map(indent-boxes(|is)) <+ id> boxes;
+//      if current-indent := <fetch-elem(?Indented(_))> a* then
+//        old-is := <?Indented(<id>)> current-indent;
+//        new-indent := Indented(<addi> (is, old-is))
+//      else
+//        new-indent := Indented(is)
+//      end
+//      
+//  indent-boxes(|is):
+//    I(opt, box{b*}){a*} -> <try(annotate-top-level-box-replace(|new-box))> I(opt, new-box{b*}){a'*}
+//    with
+//      a'*     := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-box := <try(indent-boxes(|is))> box
+//  
+//  indent-boxes(|is):
+//    S(string){a*} -> S(string){a'*}
+//    with
+//      a'* := <filter(inc-column-position(|is) <+ inc-column-position-with-layout(|is) <+ id)> a*
+//      
+//  replace-indent-boxes(|is):
+//    H(opt, boxes{b*}){a*} -> <try(annotate-top-level-box-replace(|new-boxes))> H(opt, new-boxes{b*}){a'*}
+//    with
+//      a'*       := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-boxes := <map(replace-indent-boxes(|is)) <+ id> boxes
+//      
+//  replace-indent-boxes(|is):
+//    V(opt, boxes{b*}){a*} -> <try(annotate-top-level-box-replace(|new-boxes))> V(opt, new-boxes{b*}){a'*}
+//    with
+//      a'*       := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-boxes := <map(replace-indent-boxes(|is)) <+ id> boxes
+//      
+//  replace-indent-boxes(|is):
+//    Z(opt, boxes{b*}){a*} -> <try(annotate-top-level-box-replace(|new-boxes)); replace-annotation(?Indented(_)|Indented(is))> Z(opt, new-boxes{b*}){a'*}
+//    with
+//      a'*       := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-boxes := <map(replace-indent-boxes(|is)) <+ id> boxes
+//      
+//  replace-indent-boxes(|is):
+//    I([SOpt(IS(), is2)], box{b*}){a*} -> <try(annotate-top-level-box-replace(|new-box))> I([SOpt(IS(), is2)], new-box{b*}){a'*}
+//    with
+//      a'*     := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-box := <try(replace-indent-boxes(|<addi> (is, <string-to-int> is2)))> box
+//      
+//  replace-indent-boxes(|is):
+//    RI([SOpt(IS(), is2)], box{b*}){a*} -> <try(annotate-top-level-box-replace(|new-box))> RI([SOpt(IS(), is2)], new-box{b*}){a'*}
+//    with
+//      a'*     := <filter(inc-column-position-with-layout(|is) <+ id)> a*;
+//      new-box := <try(replace-indent-boxes(|<string-to-int> is2))> box
+//  
+//  replace-indent-boxes(|is):
+//    S(string){a*} -> S(string){a'*}
+//    with
+//      a'* := <filter(inc-column-position(|is) <+ inc-column-position-with-layout(|is) <+ id)> a*    
+  
+  annotate-box-line-col(|p) :
+    S(string){a*} -> S(string){a*}
+    where
+      <eq> (<strlen> string, 0) 
+    
+  annotate-box-line-col(|p) :
+    S(string){a*} -> <add-annotation(|p)> S(string){a*}
+    where
+      <not(eq)> (<strlen> string, 0) 
+      
+  annotate-box-line-col-vertical-z(|p, vs):
+    [b | bs] -> [<annotate-box-line-col(|p)> b | <annotate-box-line-col-vertical-z(|p', vs)> bs]
+    with
+      p' := <get-end-position(|p); inc-line-position(|vs)> b
+        
+  annotate-box-line-col-vertical-z(|p, vs):
+    [] -> []
+    
+  annotate-box-line-col-vertical(|p, vs):
+    [b | bs] -> [<annotate-box-line-col(|p)> b | <annotate-box-line-col-vertical(|p', vs)> bs]
+    with
+      p' := <get-end-position(|p); inc-line-position(|vs, <?Position(_, <id>)> p)> b
+        
+  annotate-box-line-col-vertical(|p, vs):
+    [] -> []
+  
+  annotate-box-line-col-horizontal(|p, hs):
+    [b | bs] -> [<annotate-box-line-col(|p)> b | <annotate-box-line-col-horizontal(|p', hs)> bs]
+    with
+//    debug(!"annotate horizontal ");
+      if <?[]> bs then
+          p' := p
+      else
+          p' := <get-end-position(|p); inc-column-position(|hs)> b
+      end
+      
+  annotate-box-line-col-horizontal(|p, hs):
+    [] -> []  
+      
+  inc-line-position(|v, column):
+    Position(x, y) -> Position(x, y)
+    where 
+      <eq> (v, 0)
+      
+  inc-line-position(|v, column):
+    Position(x, y) -> Position(<addi> (x, v), column)
+    where 
+      <not(eq)> (v, 0)
+      
+  inc-line-position(|v):
+    Position(x, y) -> Position(x, y)
+    where 
+      <eq> (v, 0)
+      
+  inc-line-position(|v):
+    Position(x, y) -> Position(<addi> (x, v), 1)
+    where 
+      <not(eq)> (v, 0)
+    
+  inc-column-position(|v):
+    Position(x, y) -> Position(x, <addi> (y, v))
+    
+  inc-column-position-with-layout(|v):
+    PositionWithLayout(x, y) -> PositionWithLayout(x, <addi> (y, v))
+    
+//  add-position(|p):
+//    Position(x, y) -> Position(<addi> (x, z), <addi> (y, w))
+//    with
+//      <?Position(z, w)> p
+      
+  get-end-position(|p):
+    S(x) -> Position(line, <addi> (column, <string-length> x))
+    with
+     <?Position(line, column)> p
+    
+  get-end-position(|p):
+    Z([], box*) -> <get-end-position-z-list(|p)> box*
+    
+  get-end-position-z-list(|p):
+    [b | bs] -> <get-end-position-z-list(|p')> bs
+    where
+      <not(?[])> bs
+    with
+      p' := <get-end-position(|p); inc-line-position(|1)> b
+      
+  get-end-position-z-list(|p):
+    [b | bs] -> <get-end-position(|p)> b
+    where
+      <?[]> bs
+      
+  get-end-position-z-list(|p):
+    [] -> p
+      
+  get-end-position(|p):
+    H([SOpt(HS(), hs)], box*) -> <get-end-position-h-list(|p, <string-to-int> hs)> box*
+    
+  get-end-position(|p):
+    H([], box*) -> <get-end-position-h-list(|p, 1)> box*
+    
+  get-end-position-h-list(|p, hs):
+    [b | bs] -> <get-end-position-h-list(|p', hs)> bs
+    where
+       <not(?[])> bs
+    with
+       p' := <get-end-position(|p); inc-column-position(|hs)> b
+       
+  get-end-position-h-list(|p, hs):
+    [b | bs] -> <get-end-position(|p)> b
+    where
+       <?[]> bs
+  
+  get-end-position-h-list(|p, hs):
+    [] -> p  
+    
+//  get-end-position(|p):
+//   I([SOpt(IS(), is)], hbox) -> <get-end-position(|p')> hbox
+//   with
+//     p' := <inc-column-position(|<string-to-int> is)> p
+     
+//  get-end-position(|p):
+//   RI([SOpt(IS(), is)], zbox) -> <get-end-position(|p')> zbox
+//   with
+//     p' := <inc-column-position(|<string-to-int> is)> p
+  
+  get-end-position(|p):
+    V([SOpt(VS(), vs)], box*) -> <get-end-position-v-list(|p, <string-to-int> vs)> box*
+    
+  get-end-position(|p):
+    V([], box*) -> <get-end-position-v-list(|p, 1)> box*
+    
+  get-end-position-v-list(|p, vs):
+    [b | bs] -> <get-end-position-v-list(|p', vs)> bs
+    where
+       <not(?[])> bs
+    with
+       p' := <get-end-position(|p); inc-line-position(|vs, <?Position(_, <id>)> p)> b
+       
+  get-end-position-v-list(|p, vs):
+    [b | bs] -> <get-end-position(|p)> b
+    where
+       <?[]> bs
+  
+  annotate-top-level-box-replace(|subterm):
+    t{a*} -> <replace-annotation(?Position(_, _)|position)> t{a*}
+    where
+      position := <get-first-position> subterm
+      
+  annotate-top-level-box(|subterm):
+    t{a*} -> <add-annotation(|position)> t{a*}
+    where
+      position := <get-first-position> subterm
+  
+  get-first-position = collect-one(get-position-string) <+ (debug(!"couldn't find a term with positions "); fail)
+  
+  get-position-string:
+    S(_){a*} -> p
+    where
+      p := <fetch-elem(?Position(_, _))> a* 
+ 

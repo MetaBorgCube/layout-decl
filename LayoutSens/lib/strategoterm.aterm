@@ -1,0 +1,148 @@
+Module(
+  "lib/strategoterm"
+, [ Imports(
+      [Import("libspoofax/term/annotation"), Import("signatures/LayoutSensPrettyPrint-sig"), Import("libstratego-gpp"), Import("libspoofax/sdf/pp")]
+    )
+  , Signature(
+      [ Constructors(
+          [ OpDecl(
+              "Align"
+            , FunType(
+                [ConstType(SortNoArgs("ConstraintTreeReference")), ConstType(Sort("List", [SortNoArgs("ConstraintTreeReference")]))]
+              , ConstType(SortNoArgs("ShortConstraint"))
+              )
+            )
+          , OpDecl(
+              "LabelRef"
+            , FunType([ConstType(SortNoArgs("IdCon"))], ConstType(SortNoArgs("ConstraintTreeReference")))
+            )
+          , OpDecl(
+              "LiteralRef"
+            , FunType([ConstType(SortNoArgs("IdCon"))], ConstType(SortNoArgs("ConstraintTreeReference")))
+            )
+          ]
+        )
+      ]
+    )
+  , Rules(
+      [ RDefNoArgs(
+          "prettyprint-LayoutSens-Stmt"
+        , Rule(
+            NoAnnoList(
+              Op(
+                "IfElse"
+              , [Var("t1__"), Var("then__"), Var("else__")]
+              )
+            )
+          , App(
+              CallT(
+                SVar("add-annotations")
+              , []
+              , [ NoAnnoList(
+                    List(
+                      [ NoAnnoList(
+                          Op(
+                            "Align"
+                          , [ NoAnnoList(Op("LiteralRef", [NoAnnoList(Str("\"\\\"if\\\"\""))]))
+                            , NoAnnoList(
+                                List(
+                                  [NoAnnoList(Op("LiteralRef", [NoAnnoList(Str("\"\\\"else\\\"\""))]))]
+                                )
+                              )
+                            ]
+                          )
+                        )
+                      ]
+                    )
+                  )
+                ]
+              )
+            , NoAnnoList(
+                List(
+                  [ NoAnnoList(
+                      Op(
+                        "H"
+                      , [ NoAnnoList(
+                            List(
+                              [ NoAnnoList(
+                                  Op(
+                                    "SOpt"
+                                  , [NoAnnoList(Op("HS", [])), NoAnnoList(Str("\"0\""))]
+                                  )
+                                )
+                              ]
+                            )
+                          )
+                        , Var("then__")
+                        ]
+                      )
+                    )
+                  ]
+                )
+              )
+            )
+          , [ WithClause(
+                Assign(
+                  Var("then__'")
+                , App(
+                    Seq(
+                      CallT(
+                        SVar("clean-layout-empty-symbols")
+                      , []
+                      , [ NoAnnoList(Str("\"\""))
+                        , NoAnnoList(Op("FALSE", []))
+                        , NoAnnoList(Op("FALSE", []))
+                        ]
+                      )
+                    , Seq(
+                        CallNoArgs(SVar("flatten-list"))
+                      , CallT(SVar("pp-indent"), [], [NoAnnoList(Str("\"3\""))])
+                      )
+                    )
+                  , NoAnnoList(
+                      List(
+                        [ App(
+                            Seq(
+                              LChoice(
+                                Seq(CallNoArgs(SVar("check-nonterminal-isEmpty")), Id())
+                              , LChoice(
+                                  Call(SVar("pp-V-list"), [CallNoArgs(SVar("prettyprint-LayoutSens-Stmt"))])
+                                , Call(SVar("pp-one-Z"), [CallNoArgs(SVar("prettyprint-completion-aux"))])
+                                )
+                              )
+                            , CallT(
+                                SVar("add-annotations")
+                              , []
+                              , [ NoAnnoList(
+                                    List(
+                                      [ NoAnnoList(
+                                          Op(
+                                            "PPNewLineIndentBy"
+                                          , [ NoAnnoList(Int("1"))
+                                            , NoAnnoList(Op("LabelRef", [NoAnnoList(Str("\"then\""))]))
+                                            , NoAnnoList(List([]))
+                                            ]
+                                          )
+                                        )
+                                      , NoAnnoList(Op("LabelRef", [NoAnnoList(Str("\"then\""))]))
+                                      ]
+                                    )
+                                  )
+                                ]
+                              )
+                            )
+                          , Var("then__")
+                          )
+                        ]
+                      )
+                    )
+                  )
+                )
+              )
+            ]
+          )
+        )
+      ]
+    )
+  ]
+)
