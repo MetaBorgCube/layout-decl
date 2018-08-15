@@ -73,7 +73,15 @@ We have also included the results of running the full experiment in the folder `
 
 ## Using Layout Declarations inside Spoofax
 
-To test the approaches described in the paper using the Spoofax Language Workbench, first download a local copy of Eclipse with Spoofax pre-installed [here](). Then follow the steps in [http://www.metaborg.org/en/latest/source/install.html](http://www.metaborg.org/en/latest/source/install.html), in case there are any issues running Spoofax. Import the language that is going to be tested (in the folders `Haskell` or `LayoutSens`) using File → Import → Maven → Existing Maven Project and point it to one of these folders. The syntax definition for each language can be found in the subfolder `syntax` and a few examples in the subfolder `examples`. For further information on how to use Spoofax, refer to the [Spoofax documentation](http://www.metaborg.org/en/latest/source/langdev/meta/lang/tour/index.html).
+To test the approaches described in the paper using the Spoofax Language Workbench, first download a local copy of Eclipse with Spoofax pre-installed. The eclipse installations already come with an embedded JRE, and should be downloaded according with the operating system:
+
+- [Windows 32-bits](http://udesou.info/wp-content/uploads/2018/08/spoofax-windows-x86-jre.tar).
+- [Windows 64-bits](http://udesou.info/wp-content/uploads/2018/08/spoofax-windows-x64-jre.tar).
+- [Linux 32-bits](http://udesou.info/wp-content/uploads/2018/08/spoofax-linux-x86-jre.tar).
+- [Linux 64-bits](http://udesou.info/wp-content/uploads/2018/08/spoofax-linux-x64-jre.tar).
+- [macOS](http://udesou.info/wp-content/uploads/2018/08/spoofax-macosx-x64-jre.tar).
+
+ Next, follow the steps in [http://www.metaborg.org/en/latest/source/install.html](http://www.metaborg.org/en/latest/source/install.html), in case there are any issues running Spoofax. Import the language that is going to be tested (in the folders `Haskell` or `LayoutSens`) using File → Import → Maven → Existing Maven Project and point it to one of these folders. The syntax definition for each language can be found in the subfolder `syntax` and a few examples in the subfolder `examples`. For further information on how to use Spoofax, refer to the [Spoofax documentation](http://www.metaborg.org/en/latest/source/langdev/meta/lang/tour/index.html).
 
 # Technical Details
 
