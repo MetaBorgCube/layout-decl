@@ -6,18 +6,18 @@ if [ $# -ne 1 ]; then
 fi
 
 if [ "$1" = "org.metaborg.LayoutSensitiveParsingCorrectness" ]; then
-    mvn clean verify -Dmain-class=$1 -Dshortrun=true
+    mvn verify -o -Dmain-class=$1 -Dshortrun=true
 
 elif [ "$1" = "org.metaborg.LayoutSensitivePrettyPrint" ]; then
-  mvn clean verify -Dmain-class=$1 -Dshortrun=true
+  mvn verify -o -Dmain-class=$1 -Dshortrun=true
 
 elif [ "$1" = "org.metaborg.LayoutSensitiveParsingPerformance" ]; then
-  mvn clean verify -Dmain-class=org.metaborg.CreateRandomFiles -Dshortrun=true
-	mvn clean verify -Dmain-class=org.metaborg.LayoutSensitiveParsingPerformanceShortRun
+  mvn verify -o -Dmain-class=org.metaborg.CreateRandomFiles -Dshortrun=true
+	mvn verify -o -Dmain-class=org.metaborg.LayoutSensitiveParsingPerformanceShortRun
 
 elif [ "$1" = "org.metaborg.LayoutSensitiveParsingPerformanceShortRun" ]; then
-  mvn clean verify -Dmain-class=CreateRandomFiles -Dshortrun=true
-	mvn clean verify -Dmain-class=org.metaborg.LayoutSensitiveParsingPerformanceShortRun
+  mvn verify -o -Dmain-class=CreateRandomFiles -Dshortrun=true
+	mvn verify -o -Dmain-class=org.metaborg.LayoutSensitiveParsingPerformanceShortRun
 
 else
  echo "Error. Invalid benchmark name."

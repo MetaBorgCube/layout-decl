@@ -41,7 +41,11 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.5</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.metaborg</groupId>
+			<artifactId>org.metaborg.sunshine2</artifactId>
+			<version>2.5.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<properties>
@@ -99,8 +103,8 @@
 						<configuration>
 							<executable>java</executable>
 							<arguments>
-								<argument>-Xmx4G</argument>
-								<argument>-Xss16m</argument>
+								<argument>-Xmx8G</argument>
+								<argument>-Xss64m</argument>
 								<argument>-XX:MaxPermSize=256M</argument>
 								<argument>-classpath</argument>
 								<classpath />
