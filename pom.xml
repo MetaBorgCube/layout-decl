@@ -20,7 +20,6 @@
 		<module>org.metaborg.tableinterfaces</module>
 		<module>org.metaborg.characterclasses</module>
 		<module>layout-sensitive-decl</module>
-		<module>org.metaborg.sunshine2</module>
 	</modules>
 
 	<repositories>
