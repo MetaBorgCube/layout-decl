@@ -1,8 +1,8 @@
 # Installation
 
-Download the artefact (Oracle VirtualBox OVA file) from [Google Drive](https://drive.google.com/open?id=1MTzZ7Pm9YGVYdQ_zdi0Ydr2feo0q78HM). The file is compacted as a `tar.gz` file. Sometimes when extracting the file, the extractor creates an `.vmdk` and an `.ovf` file. In this case, import the `.ovf` file into Virtual Box using the instructions below.
+Download the artefact (Oracle VirtualBox OVA file) from [Google Drive](https://drive.google.com/open?id=1_v2jiGtHTnkV3yAAduWvZROv-0KexGNP). The file is compacted as a `tar.gz` file. Sometimes when extracting the file, the extractor creates an `.vmdk` and an `.ovf` file. In this case, import the `.ovf` file into Virtual Box using the instructions below.
 
-Size: 2.8 GB
+Size: 3.13 GB
 
 The artefact is distributed as a VirtualBox image. To setup the image:
 
@@ -46,15 +46,13 @@ The source code of the experiment is organized as follows:
 
 - The folders `org.spoofax.jsglr`, `org.spoofax.jsglr2`, and `org.metaborg.sdf2table` contain the implementations for the parser and parse table generator for Spoofax. The folder `org.spoofax.jsglr` contains the implementation done by [1], whereas `org.spoofax.jsglr2` contains our implementation. The folder `org.metaborg.characterclasses` and the folder `org.metaborg.tableinterfaces` contain projects that are required by the parser and/or parse table generator projects.
 
-- The folder `org.metaborg.sunshine2` contains [Spoofax Sunshine](http://www.metaborg.org/en/latest/source/sunshine/manual/index.html), a command line implementation of Spoofax necessary to invoke the pretty-printer generated from a language specification containing layout declarations.
-
 - The folder `pp-haskell` contains the pretty-printer implementation based on GHC, which pretty-prints Haskell programs using explicit layout.
 
 - The folder `Haskell` contains a Spoofax project for Haskell, whereas the folder `LayoutSens` contains an example project for a small layout-sensitive language that can be used to try out our approaches inside Spoofax.
 
 ## Running the Experiment
 
-To run the experiment, execute the command `mvn clean verify -Dmain-class=<BenchmarkName>` on the top-level directory (`/home/artefact/layout-decl`), where `<BenchmarkName>` is either `org.metaborg.LayoutSensitivePrettyPrint`, `org.metaborg.LayoutSensitiveParsingPerformance`, or `org.metaborg.LayoutSensitiveParsingCorrectness`. The full experiment that tests the layout-sensitive pretty-printer takes about 16 hours to run on a single core on an Intel Core i7 @ 2,7 GHz processor host.
+To run the experiment, execute the command `mvn -o verify -Dmain-class=<BenchmarkName>` on the top-level directory (`/home/artefact/layout-decl`), where `<BenchmarkName>` is either `org.metaborg.LayoutSensitivePrettyPrint`, `org.metaborg.LayoutSensitiveParsingPerformance`, or `org.metaborg.LayoutSensitiveParsingCorrectness`. The full experiment that tests the layout-sensitive pretty-printer takes about 16 hours to run on a single core on an Intel Core i7 @ 2,7 GHz processor host.
 The full experiment that evaluates the parser takes about 9 hours using the same configuration. The experiment that checks the correctness of the parser takes about 3 hours. The results are produced in the folder `layout-sensitive-decl/Results`.
 
 Optionally, it is also possible to run a subset of the experiment, containing just 1000 random Haskell files. To run this version execute the script `./shortrun.h <BenchmarkName>`. The smaller version of the experiment for the pretty-printer, the performance and the correctness of the parser takes about 45, 30, and 7 minutes to run, respectively, using a machine with the specifications above.
