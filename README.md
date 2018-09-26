@@ -30,7 +30,7 @@ To SSH into the guest VM, run:
 
 ## Browsing the Experiment Contents
 
-It is also possible to find the contents of the experiment on [GitHub](https://github.com/MetaBorgCube/layout-decl). Even though we provide further details for running the experiment locally (see below), we hardly advise to use the VM, as the following instructions are specific to it. The repository can be used as an alternative for file browsing and visualization.
+It is also possible to find the contents of the experiment on [GitHub](https://github.com/MetaBorgCube/layout-decl). Even though we provide further details for running the experiment locally (see below), we strongly advise to use the VM, as the following instructions are specific to it. The repository can be used as an alternative for file browsing and visualization.
 
 Another option consists of using SSHFS, which mounts the VM's file system locally. See [https://osxfuse.github.io/](https://osxfuse.github.io/) and [https://www.raspberrypi.org/documentation/remote-access/ssh/sshfs.md](https://www.raspberrypi.org/documentation/remote-access/ssh/sshfs.md) for more instructions.
 
@@ -100,7 +100,7 @@ Optionally, it is possible to run the experiment locally, i.e., outside the VM. 
 
 To download the artefact and run the experiment locally, checkout the GitHub project [https://github.com/MetaBorgCube/layout-decl](https://github.com/MetaBorgCube/layout-decl). The steps to perform the experiment locally should be similar to the ones described above, which are specific to running it on the VM. The main advantage of running the experiment locally consists of the UI support to copy/modify/visualize files.
 
-Note that the files from the benchmark are not included in the repository. Therefore to run the project locally, it is also necessary to download and extract the data used in the experiment. Further instructions can be found [here](https://github.com/udesou/layout-decl/tree/master/layout-sensitive-decl/data).
+Note that the files from the benchmark are not included in the repository. Therefore to run the project locally, it is also necessary to download and extract the data used in the experiment. Further instructions can be found [here](https://github.com/MetaBorgCube/layout-decl/tree/master/layout-sensitive-decl/data).
 
 ## Troubleshooting
 
